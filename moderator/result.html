@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/result.css">
+  
+  <title>Result Page</title>
+  <style>
+
+
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600&display=swap');
+  
+  @import url('https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap');
+     
+   
+
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+table {
+  border-collapse: collapse;
+  margin-top: 1vw;
+  color: rgb(255, 255, 255);
+  font-size: 1.5vw;
+  font-weight: 50;
+background-color: transparent;
+}
+
+th, td {
+  padding: 0.6vw;
+  text-align: center;
+  border-bottom: 1vw solid transparent;
+}
+
+thead {
+  background: linear-gradient(180deg, hsla(8, 97%, 56%, 1) 0%, hsla(6, 79%, 37%, 1) 100%);
+}
+
+tr {
+  background: linear-gradient(180deg, hsla(8, 97%, 56%, 1) 0%, hsla(6, 79%, 37%, 1) 100%);
+  border-radius: 2vw;
+  margin-bottom: 4vw;
+  position: relative;
+  overflow: hidden; /* Hide overflow for rounded corners */
+}
+
+td:first-child {
+  border-top-left-radius: 2vw;
+  border-bottom-left-radius: 2vw;
+}
+
+td:last-child {
+  border-top-right-radius: 2vw;
+  border-bottom-right-radius: 2vw;
+}
+
+.empty-row {
+  height: 0.1vw; /* Adjust the height as needed */
+  background: none; /* Optional: Set background to none if you want it transparent */
+}
+
+
+  </style>
+</head>
+<body >
+  <div id="main">
+    <div id="nav">
+        <!-- <img class="calpolalign" src="./img/calpol-01.png" alt=""> -->
+        <img class="calpolalign" src="./img/Calpol-Logo.png" alt="">
+      </div>
+
+      <div class="center">
+        <div class="glowing-effect"></div>
+            <h1>FINAL RESULTS</h1>
+        <div class="glowing-effect"></div>
+          <div id="table-bg-div">
+              <table id="userTable">
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Player Name</th>
+                      <th>Total Score</th>
+                      <th>Game Secs</th>
+                      <th>Points</th>
+                      <th>Q1 Secs</th>
+                      <th>Q2 Secs</th>
+                      <th>Q3 Secs</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+
+        </div>
+      </div>
+   </div>
+<script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+    // Initialize Firebase with your config
+  
+    const database = firebase.database();
+    const userRef = database.ref('User_Details');
+  
+    // Retrieve and sort the data based on the total_value
+    userRef.orderByChild('total_value').once('value')
+      .then(snapshot => {
+        // Convert the snapshot to an array of objects
+        const users = [];
+        snapshot.forEach(childSnapshot => {
+          const user = childSnapshot.val();
+          user.key = childSnapshot.key;
+          users.push(user);
+        });
+  
+        // Sort the array based on total_value in descending order
+        users.sort((a, b) => b.total_value - a.total_value);
+  
+        // Update the HTML table with the sorted user details
+        const tableBody = document.querySelector('#userTable tbody');
+        users.forEach((user, index) => {
+          const row = tableBody.insertRow();
+          const rankCell = row.insertCell(0);
+          const usernameCell = row.insertCell(1);
+          const totalValueCell = row.insertCell(2);
+          const gameTimerValueCell = row.insertCell(3);
+          const pointsCell = row.insertCell(4);
+          const quiz1Q1TimerValueCell = row.insertCell(5);
+          const quiz1Q2TimerValueCell = row.insertCell(6);
+          const quiz1Q3TimerValueCell = row.insertCell(7);
+  
+          rankCell.textContent = index + 1;
+          usernameCell.textContent = user.username;
+          totalValueCell.textContent = user.total_value;
+          gameTimerValueCell.textContent = user.game1_timerValue || '0';
+          pointsCell.textContent = user.points || '0';
+          quiz1Q1TimerValueCell.textContent = user.quiz1_q1_timer_Value || '0';
+          quiz1Q2TimerValueCell.textContent = user.quiz1_q2_timer_Value || '0';
+          quiz1Q3TimerValueCell.textContent = user.quiz1_q3_timer_Value || '0';
+       
+       
+  // Add empty row after each regular row (except the last one)
+  // if (index < users.length - 1) {
+  //   const emptyRow = tableBody.insertRow();
+  //   const emptyCell = emptyRow.insertCell(0);
+  //   emptyCell.colSpan = 8; // Set colSpan to match the number of columns in your table
+  //   emptyRow.classList.add('empty-row');
+  // }
+       
+       
+        });
+      })
+      .catch(error => {
+        console.error('Error retrieving data:', error);
+      });
+  </script>
+  
+
+</body>
+</html>
